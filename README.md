@@ -1,5 +1,4 @@
 # AWS Solutions Architect - Professional (SAP-C01) - Notes
----
 
 ### Security Token Service (STS)
 - Generates __Temporary__ Credentials. 
@@ -27,7 +26,7 @@ Use to limit what permissions an identity can receive.
 
 #### Resource Access Manager (RAM)
 
-![AWS RAM](./images/01 - Advance Permissions & Accounts/AWS RAM.PNG)
+![AWS RAM](images/01 - Advance Permissions & Accounts/AWS RAM.PNG)
 
 - Use to **share** AWS resources between AWS accounts.
   - Products need to be supported by RAM.
