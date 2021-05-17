@@ -81,6 +81,90 @@ Use to limit what permissions an identity can receive.
 - For API, you need to establish **TRUST** between your SAML 2.0 Compatible Identity Provider and IAM
 - For Console, you need to establish **TRUST** between your SAML 2.0 Compatible Identity Provider and the SAML/SSO Endpoint.
 - The Client Identity Provider Portal where you authenticate identifies the **roles** which are available for the authenticating user.
+- Uses *STS:AssumeRoleWithSAML* that exchanges SAML assertion with temporary credentials that will be use to access an AWS service or the AWS console.
+
+## AWS Single Sign-On (SSO)
+- Managed SSO access.
+    - Can be use for AWS accounts and External applications.
+- Flexible Identity Source, you can use:
+    - AWS SSO built-in Identity Source
+    - AWS Managed Microsoft AD
+    - On-premises Microsoft AD (using 2-way trust (AWS Managed Microsoft AD) or AD connector)
+    - External Identity Provider (SAML 2.0)
+- Preferred by AWS vs Traditional *workforce* identity federation.
+
+![SSO](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/02%20-%20Advance%20Identity%20&%20Federation/AWS%20SSO.PNG?raw=true)
+
+**NOTES:**
+- Requirement of AWS SSO is you need to have AWS Organization enabled.
+- **Permission Sets** - are way to define role-based permissions that can be assigned to an user or a group over a certain AWS account.
+    - You can use existing or custom permission sets.
+
+## AWS Cognito
+- Handles authentication, authorization and user management.
+    - use for Web and Mobile applications.
+- You can login directly to Cognito or other identity providers. 
+- Handles the exchange for AWS credentials.
+- Access AWS resources using credentials.
+- Handle Data Synchornization, Identity Merging, Managed Login UI.
+    - Data Synchornization is useful when you access an application using multiple devices as it sync's the data on all of those devices.
+
+### Cognito User Pool
+- Use for **authentication**, users can sign in through the user pool or federate through a third-party identity provider (IdP).
+- Authenticate using federated identities (e.g. FB, Google, etc.) and a successful authentication can return a **JSON Web Token** (JWT).
+    - JWT will be send to Identity Pool and the Identity Pool swaps these JWT with temporary AWS credentials via *AssumeRole*.
+        - These credentials will be use to access AWS resources.
+
+### Cognito Identity Pool
+- Use for **authorization**, you can use identity pools to create unique identities for users and give them access to other AWS services.
+- Can be used on both authenticated and unauthenticated identities.
+    - These identities will have separate role each.
+        - These roles are created during Identity Pool creation.
+        - These roles can be modified later or after creation.
+
+## Amazon Workspaces
+- Desktop-As-A-Service - primarily use for Home-working/Office.
+- Similar to Citrix / Remote Desktop - but it's hosted by AWS.
+- Consistent desktop from anywhere - apps and state.
+- Can provision Windows and Linux desktop comes with various sizes.
+- Monthly or Hourly Pricing (+ base infra costs).
+- Uses Directory Service (Simple AD, Managed AD, AD Connector) for authentication and user management.
+    - The Directory Service is a requirement when using Workspaces.
+- Windows Workspaces can access AWS FSx and EC2 Windows Resources.
+    - It can also access on-premises resources over VPN or Dirrect Connect (DX)
+- Provides EBS-based volumes (can be encrypted at rest).
+
+![Workspaces](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/AmazonWorkspaces.png)
+
+**NOTES:**
+- Workspaces and Directory Services run in *AWS Managed VPC* (controlled by AWS - not customer managed) and use **Elastic Network Interfaces (ENIs)** that will be injected into customer-managed VPCs.
+- Workspaces are not highly-available - uses ENI that only occupies a single subnet or AZ.
+- Workspaces has 2 running modes:
+    - **AlwaysOn** - billed monthly. Always running Workspaces.
+    - **AutoStop** - billed hourly. Start Workspaces when you login then stops when no longer being used.
+
+## AWS Directory Services
+
+### Managed Microsoft AD
+- Built using Microsoft Active Direcotry 2012 R2
+- Managed using Standard Active Directory Tools.
+- Supports Group policy and Single Sign-On (SSO).
+- **Supports Schema Extension** - MS AD Aware Apps.
+    - Such as SharePoint, SQL, Distributed File System (DFS).
+- Has 2 Sizes:
+    - Standard - can store up to 30,000 Objects.
+    - Enterprise - can store up to 500,000 Objects.
+- Used for AD Authentication or Authorization of products and services within AWS.
+- Highly available by default - provision 2 Domain Controllers that expands to 2 or more AZs.
+- Includes monitoring, recovery, replication, snapshots and maintenance that is configurable and managed by AWS.
+    - Includes automatic patching and maintenance.
+- **Supports one-way and two-way** external and forest with on-premise active directory
+- Can **operate independently**. It can work through network link failure to any connected on-premises systems.
+- **Supports RADIUS-based MFA**
+    - Can also be integrated with on-premises RADIUS server.
+- Best choice if you need to establish **TRUST** relationship between AWS and you On-premises directories.
+- The on-premises directory and Microsoft Managed Directory are 2 separate directories where you can establish either **one-way** or **two-way** trust.
+
 
 
 
