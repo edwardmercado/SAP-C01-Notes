@@ -122,6 +122,9 @@ Use to limit what permissions an identity can receive.
         - These roles are created during Identity Pool creation.
         - These roles can be modified later or after creation.
 
+**NOTES:**
+- When you establish Web Identity Federation where Google IDF is configured, AWS trust that Google to authneitcate, AWS accepts google proof of login then AWS exchanges this proof of login into temporary credentials which are used to access AWS resources.
+
 ## Amazon Workspaces
 - Desktop-As-A-Service - primarily use for Home-working/Office.
 - Similar to Citrix / Remote Desktop - but it's hosted by AWS.
@@ -142,6 +145,9 @@ Use to limit what permissions an identity can receive.
 - Workspaces has 2 running modes:
     - **AlwaysOn** - billed monthly. Always running Workspaces.
     - **AutoStop** - billed hourly. Start Workspaces when you login then stops when no longer being used.
+- AWS Workspaces can **only be integrated** with AWS Directory Service (e.g. Managed AD, AD Connector, Simple AD).
+- When you create Workspaces and selected directory to use, Workspaces creates a number of security groups. 
+    - These security groups will be attached to the Workspaces.
 
 ## AWS Directory Services
 
@@ -164,6 +170,111 @@ Use to limit what permissions an identity can receive.
     - Can also be integrated with on-premises RADIUS server.
 - Best choice if you need to establish **TRUST** relationship between AWS and you On-premises directories.
 - The on-premises directory and Microsoft Managed Directory are 2 separate directories where you can establish either **one-way** or **two-way** trust.
+
+![AWS DS - Managed MS AD](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/DirectoryServiceMicrosoftAD.png)
+
+**NOTES:**
+- AWS DS Managed Microsoft AD - To establish a 2-way Forest Trust between on-prem and AWS, you need to ensure that Kerberos pre-authentication settings is correct and enabled on both on-prem and AWS Domain Controller and conditional DNS Forwarder.
+- You can establish 2-way trust and because of this you can create a **Distributed File System (DFS)** which is a File Server that can be reached either in AWS or On-premises.
+- When integrating AWS & On-premises directories, AWS expects well-cared for directories.
+    - *Well-cared for directories* means that any identities within AD is define with First Name, Last Name and Email.
+    - These configuration is required when using Workspaces.
+
+
+### AD Connector
+- A pair of directory endpoints running in AWS (ENI injected in a VPC).
+- Supports directory-aware products
+- **Redirect requests** to **existing** directory service.
+- **No directory data stored in AWS** - All redirected (from AWS to On-premises).
+- Use existing on-prem AD with directory compatible AWS services.
+    - Without any identity data in AWS.
+- Mostly use for **Proof of Concepts (POC)**.
+- Has 2 sizes, Small and Large - no explicit limits but controls the amount of compute allocated.
+- Multiple AD connectors can be created to spread load.
+- **Requires** 2 subnets within a VPC - must be in different AZs.
+- **Requires** 1 or more directory servers to be configured.
+- **Requires** a working networking connection between AWS and on-premises.
+    - It will not function if this is not met.
+    - This can be a network connectivity in private via DX or VPN.
+
+![AWS DS - Managed MS AD](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/DirectoryServiceADConnector.png)
+
+**NOTES:**
+- AWS DS AD Connector is reliant on network connectivity, if the network link between AWS and On-prem fails then the Domain Controller and Workspaces will also fail.
+
+## Border Gateway Protocol
+- Autonomous Systems (AS) - routers controlled by one entity - it's a network in BGP.
+- BCP overates over TCP/179 - reliable.
+- Not automatic - peering is manually configured.
+- BGP is also known as *Path vector protocol* as it exvhanges the best path to a destination between peers.
+    - The path is called **ASPATH**.
+        - BGP does not consider the speed, it just based on ASPATH.
+- iBGP - Internal BGP - Routing within an AS's.
+- eBGP - External BGP - Routing between AS's.
+- BGP always advertises the shortest path.
+
+## Global Accelerator
+- Moves the actual AWS network closer to customers.
+- Connection enters at edge (Global Accelerator Edge Location) using Anycast IPs.
+    - These Anycast IPs are mapped on each Global Accelerator Edge Location and users connect to the neareast Global Accelerator POP.
+- Once the traffic enter the Global Accelerator Edge Location it then transit over AWS network to 1 or more locations.
+- Used for **Non HTTP or HTTPS traffics (UDP / TCP)**
+- **Does not cache anything**.
+- **Cannot be used for HTTP / HTTPS**.
+- Used for **Global TCP / UDP Optimization**.
+
+## AWS Site-to-Site VPN
+- A **logical** connection between a VPC and On-premises network that is encrypted using IPSec which runs over the public internet.
+- Can be configured to be fully Highly available.
+- **Quick to provision** - faster than Direct Connect.
+- Requirements:
+    - VPC
+    - VGW - reside in the VPC, target of one or more RTs
+    - CGW - Logical config in AWS and the configuration that represents the physical on-premises router.
+
+### Considerations
+- Speed Limit of 1.25GBPS only.
+    - Also CGW router as VPN use encryption and theres a processing overhaed for cryptographic operations.
+- Speed of setup - can be setup just hours because its all software configurations.
+
+**NOTES:**
+- VGW is HA by design, it provisions 2 endpoints located in 2 different subnets.
+- VPN is linked to VGW and it use the endpoints that VGW provides then you specify an CGW and after this VPN tunnel will be establish between 2 VGW endpoints and CGW. 
+    - One VGW : One CGW
+- When you created a new VPN connection to your existing VGW that has VPN link existing, VGW will create 2 more endpoints.
+- Can be used with DX or backup connection for DX.
+
+## Transit Gateway (TGW)
+- Supports **transitive** routing.
+- Can be used to create Global networks.
+- Can be shared between accounts using AWS RAM.
+- Can be peered with TGW in different Regions - same or cross accounts.
+    - Can also be peered with DX (using Transit VIF).
+- Offers less complexity in network topology compared to full mesh topology offered by VPC Peers or other services.
+
+## Advanced VPC Routing
+- Subnets are associated with one Route Table (RT) only.
+    - Either implicitly associated with Main Route Table or explicitly associated with custom Route Table.
+        - IF there no explicit association of RT in a subnet, the subnet will have the implicait Main RT associated.
+        - IF explicitly associated with custom RT, implicit association with Main RT will be removed.
+- IPv4 and IPv6 are handle separately within a RT.
+- Routes send traffic based on **Destination** to a **Target**.
+- All routes are evaluated - highest priority machings is used.
+
+### Route Table Priority Matching
+1. Longest Prefix - highest CIDR prefix wins.
+2. Static Routes
+3. Propagated Routes
+    - 3.a. Routes learned via DX.
+    - 3.b. Routes learned via Static VPN.
+    - 3.c. Routes learned via Dynamic (BGP) VPN.
+    - 3.d. AS_PATH
+
+### Gateway Route Tables
+- This are used to control inbound traffic coming from the outside. 
+    - Remember that Subnet Route Tables only controls traffic going out (outbound) and not going in (inbound).
+- This can be attached to Internet Gateway or Virtual Private Gateway that is used to direct inbound traffic and take actions. 
+    - Actions such as forwarding traffice to a software appliance, etc.
 
 
 
