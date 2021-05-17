@@ -1,13 +1,13 @@
 # AWS Solutions Architect - Professional (SAP-C01) - Notes
 
-### Security Token Service (STS)
+## Security Token Service (STS)
 - Generates __Temporary__ Credentials. 
 - Similar to access keys but they __EXPIRE__ and do not belong to the identity.
 - Limited Access.
 - Use to access AWS Resources.
 - Requested by an Identity (AWS or External).
 
-### Revoking Temporary Credentials
+## Revoking Temporary Credentials
 
 What will you do if temporary credentials leaked and compromised? 
 
@@ -22,11 +22,11 @@ Use __Revoke Sessions__ in the role,  this will add an *AWSRevokeOlderSessions* 
 Use to limit what permissions an identity can receive. 
 **NOTE:** They do not grant access.
 
-### Resource Access Manager and Availability Zone IDs
+## Resource Access Manager and Availability Zone IDs
 
-#### Resource Access Manager (RAM)
+### Resource Access Manager (RAM)
 
-![AWS RAM](./images/01 - Advance Permissions & Accounts/AWS RAM.PNG)
+![AWS RAM](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/01%20-%20Advance%20Permissions%20%26%20Accounts/AWS%20RAM.PNG)
 
 - Use to **share** AWS resources between AWS accounts.
   - Products need to be supported by RAM.
@@ -34,7 +34,7 @@ Use to limit what permissions an identity can receive.
 - Shared resources can be accessed natively - as if they are in the same network.
 - No charges for using the service - only the underlying services that it leverages.
 
-#### Availability Zone IDs (AZ IDs)
+### Availability Zone IDs (AZ IDs)
 - This are unique **identifiers** for a given Availability Zone.
 - AWS rotates physical facilities that are used by Availability Zones and this are not consistent in each AWS account. For example `us-east-1a` in an AWS account is not the same as other AWS account `us-east-1a`.
     - This may cause issue when sharing resources to other AWS account.
