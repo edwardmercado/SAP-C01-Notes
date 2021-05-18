@@ -1,5 +1,7 @@
 # AWS Solutions Architect - Professional (SAP-C01) - Notes
 
+> These are my personal notes from Adrian Cantrill's (SAP-C01) course. There may be errors, so please purchase his course to get the original content and show support <https://learn.cantrill.io.>
+
 ## Security Token Service (STS)
 - Generates __Temporary__ Credentials. 
 - Similar to access keys but they __EXPIRE__ and do not belong to the identity.
@@ -46,7 +48,7 @@ Use to limit what permissions an identity can receive.
     - **IF** participant is inside an AWS Organization with Sharing **enabled**, resouces will be automatically shared.
     - **IF** participant is **NOT** inside an AWS Organization OR AWS Organization Sharing is **disabled**, principal need to accept the invite.
 
-**NOTES:**
+**Notes:**
 - Shared resouces using AWS RAM cannot be modified or deleted by the account to whom you shared your resources.
     - Shared principals can interact with the resources but cannot edit or modify them.
 - AWS Resources that has been created by the owner account or each member account are cannot be seen by other accounts except to the account where they are created.
@@ -59,7 +61,7 @@ Use to limit what permissions an identity can receive.
 - Some cannot be increased due to architectural impacts.
 - High quota increase == more processing and time needed.
 
-**NOTES:**
+**Notes:**
 - AWS Service Quotas can be also used to request to increase service quotas in each service.
     - This also has Quota request template for **AWS Organization** to request a **bulk** increase for your AWS Organization member accounts.
 - You can build an CloudWatch Alarm based on a particular service quota.
@@ -77,7 +79,7 @@ Use to limit what permissions an identity can receive.
 ### SAML 2.0 Identity Federation using Console
 ![SAML 2.0 - API](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/02%20-%20Advance%20Identity%20&%20Federation/SAML%202.0%20Identity%20Federation%20-%20Console.PNG?raw=true)
 
-**NOTES:**
+**Notes:**
 - For API, you need to establish **TRUST** between your SAML 2.0 Compatible Identity Provider and IAM
 - For Console, you need to establish **TRUST** between your SAML 2.0 Compatible Identity Provider and the SAML/SSO Endpoint.
 - The Client Identity Provider Portal where you authenticate identifies the **roles** which are available for the authenticating user.
@@ -95,7 +97,7 @@ Use to limit what permissions an identity can receive.
 
 ![SSO](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/02%20-%20Advance%20Identity%20&%20Federation/AWS%20SSO.PNG?raw=true)
 
-**NOTES:**
+**Notes:**
 - Requirement of AWS SSO is you need to have AWS Organization enabled.
 - **Permission Sets** - are way to define role-based permissions that can be assigned to an user or a group over a certain AWS account.
     - You can use existing or custom permission sets.
@@ -122,7 +124,7 @@ Use to limit what permissions an identity can receive.
         - These roles are created during Identity Pool creation.
         - These roles can be modified later or after creation.
 
-**NOTES:**
+**Notes:**
 - When you establish Web Identity Federation where Google IDF is configured, AWS trust that Google to authneitcate, AWS accepts google proof of login then AWS exchanges this proof of login into temporary credentials which are used to access AWS resources.
 
 ## Amazon Workspaces
@@ -139,7 +141,7 @@ Use to limit what permissions an identity can receive.
 
 ![Workspaces](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/AmazonWorkspaces.png)
 
-**NOTES:**
+**Notes:**
 - Workspaces and Directory Services run in *AWS Managed VPC* (controlled by AWS - not customer managed) and use **Elastic Network Interfaces (ENIs)** that will be injected into customer-managed VPCs.
 - Workspaces are not highly-available - uses ENI that only occupies a single subnet or AZ.
 - Workspaces has 2 running modes:
@@ -173,7 +175,7 @@ Use to limit what permissions an identity can receive.
 
 ![AWS DS - Managed MS AD](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/DirectoryServiceMicrosoftAD.png)
 
-**NOTES:**
+**Notes:**
 - AWS DS Managed Microsoft AD - To establish a 2-way Forest Trust between on-prem and AWS, you need to ensure that Kerberos pre-authentication settings is correct and enabled on both on-prem and AWS Domain Controller and conditional DNS Forwarder.
 - You can establish 2-way trust and because of this you can create a **Distributed File System (DFS)** which is a File Server that can be reached either in AWS or On-premises.
 - When integrating AWS & On-premises directories, AWS expects well-cared for directories.
@@ -199,7 +201,7 @@ Use to limit what permissions an identity can receive.
 
 ![AWS DS - Managed MS AD](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/02%20-%20Advance%20Identity%20%26%20Federation/DirectoryServiceADConnector.png)
 
-**NOTES:**
+**Notes:**
 - AWS DS AD Connector is reliant on network connectivity, if the network link between AWS and On-prem fails then the Domain Controller and Workspaces will also fail.
 
 ## Border Gateway Protocol
@@ -232,12 +234,25 @@ Use to limit what permissions an identity can receive.
     - VGW - reside in the VPC, target of one or more RTs
     - CGW - Logical config in AWS and the configuration that represents the physical on-premises router.
 
+### Static vs Dynamic VPN
+![Static vs Dynamic VPN](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/AWS%20Site-to-Site%20VPN%20-%20Static%20vs%20Dynamic%20VPN.PNG)
+
+- Dynamic VPN setup will only work if your router supports BGP.
+
+### Static VPN - Partial HA Setup
+![Static VPN - Partial HA](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/03%20-%20Networking%20&%20Hybrid/AWS%20Site-to-Site%20VPN%20-%20Static%20VPN%20-%20Partial%20HA.PNG?raw=true)
+
+### Static VPN - Full HA Setup
+![Static VPN - Full HA](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/03%20-%20Networking%20&%20Hybrid/AWS%20Site-to-Site%20VPN%20-%20Full%20HA.PNG?raw=true)
+
+- In this setup, it's a full-mesh topology between VPC's and lots of Admin overhead.
+
 ### Considerations
 - Speed Limit of 1.25GBPS only.
     - Also CGW router as VPN use encryption and theres a processing overhaed for cryptographic operations.
 - Speed of setup - can be setup just hours because its all software configurations.
 
-**NOTES:**
+**Notes:**
 - VGW is HA by design, it provisions 2 endpoints located in 2 different subnets.
 - VPN is linked to VGW and it use the endpoints that VGW provides then you specify an CGW and after this VPN tunnel will be establish between 2 VGW endpoints and CGW. 
     - One VGW : One CGW
@@ -251,6 +266,14 @@ Use to limit what permissions an identity can receive.
 - Can be peered with TGW in different Regions - same or cross accounts.
     - Can also be peered with DX (using Transit VIF).
 - Offers less complexity in network topology compared to full mesh topology offered by VPC Peers or other services.
+
+![TGW](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/AWS%20Transite%20Gateway.PNG)
+
+**Notes:**
+- Transit Gateway needs to have attachments to everything that it will route traffice between.
+- Transit Gateway topology is better than static VPN in full HA setup.
+    - TGW support transitive routting that simplifies that management of multiple route tables allowing complex routing architectures.
+
 
 ## Advanced VPC Routing
 - Subnets are associated with one Route Table (RT) only.
@@ -275,6 +298,42 @@ Use to limit what permissions an identity can receive.
     - Remember that Subnet Route Tables only controls traffic going out (outbound) and not going in (inbound).
 - This can be attached to Internet Gateway or Virtual Private Gateway that is used to direct inbound traffic and take actions. 
     - Actions such as forwarding traffice to a software appliance, etc.
+
+## Accelerated Site-to-Site VPN
+- Use to optimize the connectivity between on-premises to your AWS VPC by leveraging the combination of Global Accelerator, Transit Gateway and Site-to-Site VPN.
+    - On-premises <-> VPN <-> Global Accelerator POP <-> Transit Gateway <-> Your VPC.
+- Cannot be used by Virtual Private Gateway.
+
+![Accelerated Site-to-Site VPN - 1](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/Accelerated%20Site-to-Site%20VPN%20-%20On-Prem%20to%20Global%20Accelerator%20Edge%20Location%20view.PNG)
+
+![Accelerated Site-to-Site VPN - 2](https://github.com/edwardmercado/SAP-C01-Notes/blob/main/images/03%20-%20Networking%20&%20Hybrid/Accelerated%20Site-to-Site%20VPN%20-%20Global%20Accelerator%20Edge%20Location%20to%20TGW%20view.PNG?raw=true)
+
+**Notes:**
+- TGW attachments with VPN setup will create Site-to-Site VPN connections.
+    - In these Site-to-Site VPN Connections you can download the connection configuration to be use in setups.
+- When you create 1 VPN connection or 1 TGW VPN attachment, these will create 2 tunnels.
+    - Both tunnels go to AWS and 1 CGW.
+    - Tunnel is a network connection between 2 location which is encrypted and this tunnel goes between 2 endpoints.
+- **VPN Tunnel inside IPs** are associate with the actual data being transffered and the BGP connection which exchanges routing information.
+- **VPN Tunnel outside IPs** are associated with the tunnel intself the encrypted connections between AWS and On-premises.
+
+## AWS Direct Connect (DX) - Physical
+- DX lins your on-premises network to AWS, it does it physically with fibr cables.
+- To create DX connection, you need to:
+    - Create a connection within you AWS account.
+    - Choose speed, either 1Gbps or 10Gbps.
+    - Choose DX location.
+- After this, AWS will allocate a DX port in that DX location.
+- Depends on the speed you selected, you'll be given either:
+    - 1000-Base-LX
+    - 10GBASE-LR
+- To connect to the DX port that AWS allocated and to the router that your internet provider allocated inside the DX Location, you need to arrange *cross-connect* between.
+    - This will establish connection between your DX port on the AWS DX router and your Customer DX router.
+    - There's an authorization needed to perform *cross-connect* from AWS Rack and Customer Rack.
+    - *Cross-connect* happens at the DX Location.
+
+![AWS Direct Connect (DX) - Physical](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/AWS%20Direct%20Connect%20-%20Physical%20Connection.PNG)
+
 
 
 
