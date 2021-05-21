@@ -334,6 +334,62 @@ Use to limit what permissions an identity can receive.
 
 ![AWS Direct Connect (DX) - Physical](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/AWS%20Direct%20Connect%20-%20Physical%20Connection.PNG)
 
+## AWS Direct Connect (DX) - Logical
+- Virtual Interface (VIF) - the thing that transfer data.
+    - VLAN and BGP session.
+- 3 Types of VIF
+    - **Private VIF** 
+        - use to access *AWS VPC using Private IP addresses*.
+        - By default, it can connect to VPC as the same Region.
+        - Connects to the VGW that is attached on the VPC.
+    - **Public VIF** 
+        - use to access *AWS Public Services using their Public IP addresses*.
+        - Cannot be used to access the Public internet, its for AWS Public Zone Services only.
+    - **Transit VIF** 
+        - use to access one or more AWS VPC Transit Gateway associated with DX Gateway.
+
+![AWS Direct Connect (DX) - Logical](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/AWS%20Direct%20Connect%20-%20Logical%20Connection.PNG)
+
+## Direct Connect (DX) Types
+- via **AWS**
+    - Dedicated connection - direct from AWS.
+    - Speed: 1GB / 10GBPS
+- via **Partner**
+    - Ranges of speed between 50MBPS -> 10GBPS.
+    - Types:
+        - **Hosted Connection** 
+            - a DX Connection with *one VIF*.
+            - All the bandwidth is dedicated with a *single VIF*.
+            - If you require more VIF, you need an additional hosted connection.
+        - **Hosted VIF**
+            - Cannot specify speed as it is *shared connection*.
+            - It shares the bandwidth of the parent DX connection which is in the partner account.
+
+**Notes:**
+- DX is *not encrypted*.
+    - To encrypt it, you can use the Public VIF + S2S VPN.
+- DX does not shares your internet data cap.
+- DX does not shares your internet bandwidth.
+- No transit over the internet - low / consistent latency.
+- Cheaper data transfer - faster speeds.
+
+## DX Link Aggregration Groups (LAG) - SPEED
+- LAG is for **improving speed and manageability**.
+- Combines 2 DX connection to 1, to achieve high speed connection.
+    - 4 DX Max, **must be at the same speed and same DX location**.
+- Multiple Physical Connection act as one - Speed * n.
+- Active / Active Architecture.
+- Maximum of 4 Connection per LAG
+- All connection need to be the same speed.
+    - and also be terminated at the same DX location.
+- A LAG has a *minimumLinks* attribute - the LAG is considered *Active* as long this attribute or more connections are active.
+    - e.g. if *minimumLinks* is set to 2 then you have 3 active connection the LAG is still active; if the active connection decreased to 2, the LAG is still active; if the active connection decreased to 1, the LAG is considered *Failed*.
+        - if active connections are less than the *minimumLinks* the LAG will *Fail*.
+
+![AWS Direct Connect (DX) - LAG](https://raw.githubusercontent.com/edwardmercado/SAP-C01-Notes/main/images/03%20-%20Networking%20%26%20Hybrid/Direct%20Connect%20-%20Link%20Aggregation%20Groups%20(LAG).PNG)
+
+
+
 
 
 
